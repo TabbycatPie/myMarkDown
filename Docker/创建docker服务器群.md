@@ -87,13 +87,13 @@ DockerHub上的   ： [MariaDB的官方说明](https://hub.docker.com/_/mariadb)
 
 ```shell
 docker run -itd 
-		   --name=mariadb_main   #容器名称
-		   --network=OscarsNet   #连接到自定义网络
-		   -e MYSQL_ROOT_PASSWORD=123456790 #你的ROOT密码
-		   -v /home/docker/mariadb_main/appconfig:/etc/mysql  #配置文件
-		   -v /home/docker/mariadb_main/appdata:/var/lib/mysql#数据文件
-		   -p 3336:3306 #暴露内部3306端口到外部，提供远程连接
-		   mariadb #镜像名称，如需下载特定版本在后面加‘:’然后输入TAG即可
+		   --name=mariadb_main  							    #容器名称
+		   --network=OscarsNet  							    #连接到自定义网络
+		   -e MYSQL_ROOT_PASSWORD=123456790					    #你的ROOT密码
+		   -v /home/docker/mariadb_main/appconfig:/etc/mysql    #配置文件
+		   -v /home/docker/mariadb_main/appdata:/var/lib/mysql  #数据文件
+		   -p 3336:3306							 #暴露内部3306端口到外部，提供远程连接
+		   mariadb 						#镜像名称，如需下载特定版本在后面加‘:’然后输入TAG即可
 
 
 #参数说明
@@ -134,3 +134,16 @@ rm -rf /home/docker/mariadb_main/appconfig/mysql
 
 ```
 
+#### 安装成功
+
+进去Navicat或者其他数据库远程工具查看
+
+![image-20210218220641118](image-20210218220641118.png)
+
+填入信息，注意Port口需要填写宿主机暴露的端口，本例中是 **(Docker)3306  >>>EXPOSE>>> 3336 (HOST)**
+
+填写账户密码之后然后连接进去，随便选一个database，ok！成功！
+
+
+
+![image-20210218221102069](image-20210218221102069.png)
