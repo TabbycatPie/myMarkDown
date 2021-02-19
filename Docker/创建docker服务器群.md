@@ -16,13 +16,11 @@ DockerHub上的   ： [MariaDB的官方说明](https://hub.docker.com/_/mariadb)
 
 > mariadb 是mysql被oracle收购之后fork出来的一个开源分支，为的是规避mysql被闭源的风险，两款软件上如出一辙，具有非常好的兼容性。
 
-#### 安装之前的准备
-
 首先需要在宿主机上安装dockerCE并将其运行起来，之后就可以开始安装我们的Mariadb了。
 
-但是在这之前，还需要做一些准备工作
+但是在这之前，还需要做一些准备工作。
 
-* 确保之前没有安装过其他~~奇奇怪怪~~的镜像
+* 确保之前没有安装过其他~~奇奇怪怪~~的镜像。
 
   ```shell
   #不知道怎么删除的话可以试试下面的命令
@@ -30,7 +28,7 @@ DockerHub上的   ： [MariaDB的官方说明](https://hub.docker.com/_/mariadb)
   docker rmi -f $(docker images -qa) #删除所有本地镜像
   ```
 
-* 我们需要为运行在Docker 中的服务提供一个本地的 **配置** 和 **数据** 存放的空间，方便之后映射，这样在容器生命周期结束，或者意外删除之后我们的配置文件和数据不至于丢失
+* 我们需要为运行在Docker 中的服务提供一个本地的 **配置** 和 **数据** 存放的空间，方便之后映射，这样在容器生命周期结束，或者意外删除之后我们的配置文件和数据不至于丢失。
 
   ```shell
   #以下为笔者自建目录，感受一下，明白意思即可，大可不必都照着做
@@ -45,7 +43,7 @@ DockerHub上的   ： [MariaDB的官方说明](https://hub.docker.com/_/mariadb)
   
   ```
 
-* 因为宿主机还需要添加很多 **互相之间需要网络连接** 的服务应用，所以需要自建一个网络，方便之后容器之间的互联
+* 因为宿主机还需要添加很多 **互相之间需要网络连接** 的服务应用，所以需要自建一个网络，方便之后容器之间的互联。
 
   ```shell
   #首先查询一下网络，发现有三个默认网络
@@ -79,7 +77,7 @@ DockerHub上的   ： [MariaDB的官方说明](https://hub.docker.com/_/mariadb)
 
   之后只要是在此网络之内的 **所有** 主机，通过对方的 **容器名称** 都可以Ping到对方
 
-  原理可以理解为自动的把主机名称添加到了各个容器的host文件中
+  原理可以理解为自动的把主机名称添加到了各个容器的host文件中。
 
 #### 开始安装MariaDB
 
@@ -96,7 +94,7 @@ docker run -itd
 		   mariadb 						#镜像名称，如需下载特定版本在后面加‘:’然后输入TAG即可
 
 
-#参数说明
+#    参数解释
 #    -itd        				 以交互模式运行
 #    --name       				 为容器起一个名字（上面的例子中就叫main）
 #	 --network				     连接到自定义网络
@@ -147,3 +145,118 @@ rm -rf /home/docker/mariadb_main/appconfig/mysql
 
 
 ![image-20210218221102069](image-20210218221102069.png)
+
+
+
+## 2.Nextcloud Installtion
+
+![image-20210219134145845](image-20210219134145845.png)
+
+DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcloud)
+
+> A safe home for all your data. Access & share your files, calendars, contacts, mail & more from any device, on your terms.
+>
+> 翻译成人话就是：你的~~小姐姐~~数据的家，随时随地用任何设备都可以访问分享你的数据
+>
+> 这个项目的前身是owncloud，估计用过的一眼就看出来了，也是当时开发组不满owncloud的闭源，一部分人离职直接搞了个新的出来，好家伙直接起名叫 ‘NEXT’ 下一代云，牛皮牛皮！下面我们就来看看吧这个牛逼装进容器里会发生什么化学反应。
+
+#### 安装之前的准备
+
+* 确保自己有足够的空间来存放文件，最好是使用 **网络挂载** 局域网NAS的SMB或者nfs路径（笔者的NAS暂时用的 [OMV](https://www.openmediavault.org/)，并且数据和前台服务分离--就是有两台物理机，这可以增加系统的 安全性 和 灵活性）。
+* 上面我们不是已经安装了MariaDB并且已经配置好并启动了容器，现在我们要在MariaDB上创建为nextcloud专门创建一个用户和数据库，并开放权限，之后的初始化建表的工作，Nextcloud就会自动帮我们完成啦 ~ 下面提供两种方法新建用户并赋予权限
+  * **Navicat直接GUI上操作**
+    
+    1. 连接上服务器之后点击 User(用户)按钮
+    
+    2. 点击添加用户
+    
+    3. 按照规则填写相关信息，保存之后就可以在Objects标签下看到你所创建得用户了
+    
+       ![image-20210219202529141](image-20210219202529141.png)
+    
+    4. 之后需要创建一个供Nextcloud使用得数据库，在连接上右键，点击新建数据库填写相关信息即可
+    
+       ![image-20210219203007026](image-20210219203007026.png)
+    
+    5. 下面要把nextcloud_db得权限全部付给nextcloud_user，让其全权管理
+    
+    6. 新开一个查询窗口
+    
+       ![image-20210219203557879](image-20210219203557879.png)
+    
+    7. 把这段话复制到窗口中直接执行
+    
+       ```sql
+       GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY 'nextcloudpasswd';
+       FLUSH PRIVILEGES;
+       ```
+    
+       
+    
+    8. 运行成功
+    
+       ![image-20210219204115191](image-20210219204115191.png)
+
+  * **shell中手动操作**
+
+    1. 首先我们直接进入容器shell
+
+    ```shell
+    [root@localhost ~]# docker exec -it mariadb_main bash
+    root@7e1c3a11843b:/#
+    ```
+
+    2. 输入 mysql -p 并输入密码，进入数据库
+
+    ```shell
+    root@7e1c3a11843b:/# mysql -p
+    Enter password:
+    Welcome to the MariaDB monitor.  Commands end with ; or \g.
+    Your MariaDB connection id is 9
+    Server version: 10.5.8-MariaDB-1:10.5.8+maria~focal mariadb.org binary distribution
+    
+    Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+    
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+    
+    MariaDB [(none)]>
+    
+    ```
+
+    3. 输入以下SQL 完成创建数据库
+
+    ```sql
+    CREATE DATABASE nextcloud_db; 
+    CREAT USER nextcloud_user@localhost identified by 'nextcloudpasswd'; 
+    GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY 'nextcloudpasswd'; 
+    EXIT;
+    ```
+
+  * 都21世纪了怎么能少了自动化脚本 ？将此脚本复制到docker宿主机上运行即可
+
+    ```shell
+    #运维快乐jio本复制粘贴区
+    #脚本未经测试，要是拉垮本人不负任何责任
+    
+    #!/bin/bash
+    
+    #database username and passwrod
+    MYSQL_USER_NAME='root'            #自行修改即可
+    MYSQL_PASSWORD='123456'  		  #自行修改即可
+    
+    docker exec -it maria_main mysql -u$MYSQL_UER_NAME -p$MYSQL_PASSWORD -e "CREATE DATABASE nextcloud_db;CREAT USER nextcloud_user@localhost identified by \'nextcloudpasswd\';GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY \'nextcloudpasswd\';EXIT;"
+    
+    # 参数解释
+    # -u   ： 后面**无空格**跟数据库用户名
+    # -p   ： 后面**无空格**跟数据库密码
+    # -e   ： 需要执行得SQL
+    
+    echo "Created"
+    echo "DataBase   : nextcloud_db"
+    echo "User       : nextcloud_user"
+    echo "Password   : nextcloudpasswd"
+    ```
+
+#### 开始安装Nextcloud
+
+> 终于到了开心得安装环节啦，下班码码字再走发现已经块10点了，继续继续
