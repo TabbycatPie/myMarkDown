@@ -1,9 +1,7 @@
 #!/bin/bash
-
 #新建数据库
-
-read -p 'ROOT password for MariaDB:' password
-read -p 'Local port for MariaDB:' port_num
+read -p 'ROOT password for MariaDB:'password
+read -p 'Local port for MariaDB:'port_num
 
 #create dockers
 echo 'Creating test dockers'
