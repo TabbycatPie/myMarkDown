@@ -246,7 +246,7 @@ DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcl
     MYSQL_USER_NAME='root'            #自行修改即可
     MYSQL_PASSWORD='123456'  		  #自行修改即可
     
-    docker exec -it maria_main mysql -u$MYSQL_UER_NAME -p$MYSQL_PASSWORD -e "CREATE DATABASE nextcloud_db;CREAT USER nextcloud_user@localhost identified by \'nextcloudpasswd\';GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY \'nextcloudpasswd\';EXIT;"
+    docker exec -it mariadb_main mysql -u$MYSQL_UER_NAME -p$MYSQL_PASSWORD -e "CREATE DATABASE nextcloud_db;CREAT USER nextcloud_user@localhost identified by \'nextcloudpasswd\';GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY \'nextcloudpasswd\';EXIT;"
     
     # 参数解释
     # -u   ： 后面**无空格**跟数据库用户名
