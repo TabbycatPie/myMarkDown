@@ -1,7 +1,7 @@
 #!/bin/bash
 #新建数据库
-read -p 'ROOT password for MariaDB:'password
-read -p 'Local port for MariaDB:'port_num
+read -p 'ROOT password for MariaDB:' password
+read -p 'Local port for MariaDB:' port_num
 
 #create dockers
 echo 'Creating test dockers'
@@ -22,11 +22,15 @@ rm -rf /home/docker/mariadb_main/appconfig/mysql
 
 #为Nextcloud 创建用户、数据库，并分配权限
 
-MYSQL_USER_NAME='root'       
+echo     
+echo '--------------------------------------------------------------------------'
+echo 'MariaDB is starting please WAIT untill services are started' 
+echo '           and then press any key to continue.'  
+read -n 1
 
-docker exec -it mariadb_main mysql -u$MYSQL_UER_NAME -p$password -e "CREATE DATABASE nextcloud_db;CREAT USER nextcloud_user@localhost identified by \'nextcloudpasswd\';GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY \'nextcloudpasswd\';EXIT;"
+docker exec -it mariadb_main mysql -uroot -p$MYSQL_ROOT_PASSWORD -e "CREATE DATABASE nextcloud_db;CREAT USER nextcloud_user@localhost identified by \'nextcloudpasswd\';GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY \'nextcloudpasswd\';EXIT;"
 
-if [$? -ne 0];then
+if [ $? -ne 0 ];then
     echo "Failed!"
     exit 1;
 else
