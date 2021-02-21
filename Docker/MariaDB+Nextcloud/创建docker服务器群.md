@@ -3,10 +3,12 @@
 > 这段时间闲得没事~~淦~~干，学了下Docker，发现tmd这玩意还是有点东西的，本着生命不息折腾不止的作死心态，像用docker实现一下跑在家里服务器上的各种服务(以前配置时还真费了不少时间)，家里的Server通过动态域名DDNS对外提供一些~~不痛不痒~~但是还比较好用的服务，如NAS、私人博客、影音服务器、~~小姐姐城堡~~、自建聊天服务器等等等等，分为以下几个部分,篇幅限制，那就先折腾一下Nextcloud+Mariadb的云储存吧，折腾这东西不比你博人传燃？
 >
 > 1. Mariadb Docker版的安装配置说明
-> 2. Nextcloud 的安装与配置
-> 3. 配置 LetsEncrypt 为不同节点 HTTPS 反向代理子域名
-> 4. Jellyfin Docker 硬件直通和配置
-> 5. RocketChat的安装和使用
+> 2. Nextcloud 的安装与配置，实现个人云盘
+> 3. 配置 LetsEncrypt 为不同节点 HTTPS 反向代理子域名，实现加密通话
+> 4. Jellyfin Docker 硬件直通和配置，实现个人影音平台，~~性感服务器~~在线转码
+> 5. RocketChat的安装和使用，实现个人聊天服务器
+> 6. gogs搭建自己的代码库
+> 7. typecho或者wordpress实现个人博客
 
 ## 1.Mariadb Installation
 
@@ -380,9 +382,9 @@ d70ce9e94f5a   nextcloud   "/entrypoint.sh apac…"   19 minutes ago   Up 19 min
 
      如果配置没问题，那就重启一下nextcloud容器和maria的容器了，毕竟重启解决50%问题这个名句砸门还是要信一信。
 
-  4. 之后遇到什么问题会在这里继续更新
+     ----------------------------
 
-  ----------------------------------------------------
+     完结撒花
 
-  2021-02-21    --by oscar
+  
 
