@@ -233,6 +233,9 @@ DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcl
     GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY 'nextcloudpasswd';   --授予用户对数据库的权限
     FULSH PRIVILEGES;   --刷新权限
     EXIT;
+    ```
+  ```
+  
   ```
   
 * 都21世纪了怎么能少了自动化脚本 ？将此脚本复制到docker宿主机上运行即可
@@ -270,15 +273,22 @@ DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcl
 docker run -itd 										#以交互模式运行
            --name=nextcloud_main 						  #容器名称
            --network=OscarsNet  						  #连接到网络（会自动帮你配置host）
-           -v /home/docker/nextcloud/appconfig:/var/www/html #挂载配置目录到本地
-           -v /home/NextCloud/:/var/www/html/data 			#挂载数据目录到本地
-           -p 81:80 								      #暴露端口
+           -v /home/docker/nextcloud/appconfig:/var/www/html #挂载 配置 目录到本地
+           -v /home/NextCloud/:/var/www/html/data 			 #挂载 数据 目录到本地
+           -p 81:80 								      #暴露81端口
            nextcloud									 #镜像名称
           
 #参数解释
 #其他都跟上面mariadb的一样
 # -p   :  开放宿主机的81端口并转发到容器的80端口，nextcloud主要是靠网页提供服务，默认端口是80
 ```
+
+```shell
+# 一键脚本复制区
+docker run -itd --name=nextcloud_main --network=OscarsNet -v /home/docker/nextcloud/appconfig:/var/www/html -v /data/NextCloud:/var/www/html/data -p 81:80 nextcloud
+```
+
+
 
 等待显示容器id之后就表示安装完成了，用命令查看一下
 
@@ -294,13 +304,85 @@ d70ce9e94f5a   nextcloud   "/entrypoint.sh apac…"   19 minutes ago   Up 19 min
 
 * 安装好之后直接通过宿主机ip:81端口进入Nextcloud配置界面
 
-  ```shell
-  docker run -itd --name=nextcloud_main --network=OscarsNet -v /home/docker/nextcloud/appconfig:/var/www/html -v /home/NextCloud:/var/www/html/data -p 81:80 nextcloud
-  
-  
-  UPDATE user SET Host='%' WHERE User="nextcloud_user";  --设置用户可远程登录
-  ```
+  ![Snipaste_2021-02-21_18-40-54](Snipaste_2021-02-21_18-40-54.png)
+
+  根据刚刚的数据库信息填写正确的信息，之后点击“Finish setup”完成安装
+
+#### 安装成功
+
+![Snipaste_2021-02-21_18-49-16](Snipaste_2021-02-21_18-49-16.png)
+
+进到这个界面就表示安装成功啦~Nice！
+
+#### 常见问题
+
+* 点击按钮之后有很多坑随便列几个比较常见的，给一下解决方案
+
+  1. 直接打不开网页
+
+     这个时候就要康康你的防火墙配置了啊
+
+     ```shell
+     #centos 7 及以上版本都是使用firewall-cmd命令来更改防火墙配置啦，iptabales在这里就不赘述了
+     #原理就是把宿主机的81端口暴露出去
+     firewall-cmd --zone=public --add-port=81/tcp --permanent #开放81端口
+     firewall-cmd --reload            						 #重载防火墙规则
+     firewall-cmd --list-all									 #之后查看一下
+     ```
+
+     出现以下信息说明已经成功添加规则
+
+     ```shell
+     [root@localhost data]# firewall-cmd --list-all
+     public (active)
+       target: default
+       icmp-block-inversion: no
+       interfaces: eno1
+       sources:
+       services: dhcpv6-client ssh
+       ports: 81/tcp 8089/tcp 3366/tcp         #这里可以看到81端口已经是对外开放的了
+       protocols:
+       masquerade: no
+       forward-ports:
+       source-ports:
+       icmp-blocks:
+       rich rules:
+     
+     ```
 
      
 
-  
+  2. 权限问题
+
+     ![Snipaste_2021-02-21_18-41-12](Snipaste_2021-02-21_18-41-12-1613905747062.png)
+
+     无法创建或写入 data路径
+
+     进到docker 里面去chown -R 一下
+
+     ```shell
+     docker -exec -it nextcloud_main bash       #在宿主机输入命令进入容器内部
+     cd /var/www/html                           #一般默认的工作目录就会在这个目录下
+     chown -R www-data:root ./*                 #把html文件夹下的所有文件的权限改掉
+     #若数据文件较多可能会花费不少时间去修改权限
+     
+     # 参数解释
+     # -R              ：    递归修改，包括子文件夹 
+     ```
+
+  3. 截图弄掉了就不演示了，大概意思就是数据库连接不上或者拒绝连接
+
+     遇到这种情况一般就是mairadb那边的用户没有允许远程登录，这里用navicat检查一下
+
+     ![image-20210221192027582](image-20210221192027582.png)
+
+     连进数据库看一看Host是不是%，%的意思就是所有的ip都可以用（192.168.1.%就是只允许192.168.1.0/24网段的计算机进行连接）出现上诉问题的话这里有可能是localhost也就是只允许本地登录。
+
+     如果配置没问题，那就重启一下nextcloud容器和maria的容器了，毕竟重启解决50%问题这个名句砸门还是要信一信。
+
+  4. 之后遇到什么问题会在这里继续更新
+
+  ----------------------------------------------------
+
+  2021-02-21    --by oscar
+

@@ -1,72 +1,90 @@
 #!/bin/bash
-#新建数据库
-read -p 'ROOT password for MariaDB:' password
-read -p 'Local port for MariaDB:' port_num
-#networks name
 network_name="OscarsNet"
+read -p "Install MariaDB? (y/n):" answer
+if [ $answer == 'y' ];then
+    #开始安装数据库
+    read -p 'ROOT password for MariaDB:' password
+    read -p 'Local port for MariaDB:' port_num
+    #networks name
 
-#create network
-echo "Creating network"
-docker network create --driver bridge --subnet 172.172.0.0/16 --gateway 172.172.0.1 $network_name
+    #create network
+    echo "Creating network ......"
+    docker network create --driver bridge --subnet 172.172.0.0/16 --gateway 172.172.0.1 $network_name
 
-#create dockers
-echo 'Creating dockers'
-docker run -itd --name=mariadb_main --network=$network_name -e MYSQL_ROOT_PASSWORD=$password -v /home/docker/mariadb_main/appconfig:/etc/mysql -v /home/docker/mariadb_main/appdata:/var/lib/mysql -p $port_num:3306 mariadb
-docker run -d --name=mariadb_test -e MYSQL_ROOT_PASSWORD=$password mariadb
+    #create dockers
+    echo 'Creating mariadb container ......'
+    docker run -itd --name=mariadb_main --network=$network_name -e MYSQL_ROOT_PASSWORD=$password -v /home/docker/mariadb_main/appconfig:/etc/mysql -v /home/docker/mariadb_main/appdata:/var/lib/mysql -p $port_num:3306 mariadb
+    docker run -d --name=mariadb_test -e MYSQL_ROOT_PASSWORD=$password mariadb
 
-#copy data
-docker cp mariadb_test:/etc/mysql /home/docker/mariadb_main/appconfig
+    #copy data
+    docker cp mariadb_test:/etc/mysql /home/docker/mariadb_main/appconfig
 
-#clean
-echo 'cleaning'
-docker rm -f mariadb_test
-cd /home/docker/mariadb_main/appconfig/mysql
-mv ./* ../ 
-rm -rf /home/docker/mariadb_main/appconfig/mysql
+    #clean
+    echo 'cleaning ......'
+    docker rm -f mariadb_test
+    cd /home/docker/mariadb_main/appconfig/mysql
+    mv ./* ../ 
+    rm -rf /home/docker/mariadb_main/appconfig/mysql
 
-#为Nextcloud 创建用户、数据库，并分配权限
+    #为Nextcloud 创建用户、数据库，并分配权限
 
-#等待mariadb容器启动
-#wait container start
-sleep_time=5
-echo "Please wait for "$sleep_time" for container starting ...... "
-while [ $sleep_time -gt 0 ]
-do
-    echo -ne "\r"$sleep_time"s"
-    sleep 1
-    sleep_time=$(expr $sleep_time - 1)
-done
+    #等待mariadb容器启动
+    #wait container start
+    sleep_time=5
+    echo "Please wait for "$sleep_time" for container starting ...... "
+    while [ $sleep_time -gt 0 ]
+    do
+        echo -ne "\r"$sleep_time"s"
+        sleep 1
+        sleep_time=$(expr $sleep_time - 1)
+    done
 
-#测试一下哪个变量能看到密码
-# echo "password : " $MYSQL_ROOT_PASSWORD
-# echo "password : " $password
+    #测试一下哪个变量能看到密码
+    # echo "password : " $MYSQL_ROOT_PASSWORD
+    # echo "password : " $password
 
-echo "\rCreating database ...... "
-docker exec -it mariadb_main mysql -uroot -p$password -e "CREATE DATABASE nextcloud_db;"
-if [ $? -ne 0 ];then
-    echo "Creating database Failed!"
-    exit 1;
+    echo "Creating database ...... "
+    docker exec -it mariadb_main mysql -uroot -p$password -e "CREATE DATABASE nextcloud_db;"
+    if [ $? -ne 0 ];then
+        echo "Creating database Failed!"
+        exit 1;
+    fi
+    echo "Creating database user ......"
+    docker exec -it mariadb_main mysql -uroot -p$password -e "CREATE USER 'nextcloud_user'@'%' identified by 'nextcloudpasswd';"
+    if [ $? -ne 0 ];then
+        echo "Creating user Failed!"
+        exit 1;
+    fi
+    echo "Setting privileges ......"
+    docker exec -it mariadb_main mysql -uroot -p$password -e "GRANT ALL PRIVILEGES ON nextcloud_db.* TO 'nextcloud_user'@'%' IDENTIFIED BY 'nextcloudpasswd';FLUSH PRIVILEGES;"
+    if [ $? -ne 0 ];then
+        echo "Graning privileges Failed!"
+        exit 1;
+    fi
+    echo "Created"
+    echo "DataBase   : nextcloud_db"
+    echo "User       : nextcloud_user"
+    echo "Password   : nextcloudpasswd"
+    echo "Entry localhost:"$port" to access"
 fi
-echo "Creating database user ......"
-docker exec -it mariadb_main mysql -uroot -p$password -e "CREATE USER nextcloud_user@localhost identified by 'nextcloudpasswd';"
-if [ $? -ne 0 ];then
-    echo "Creating user Failed!"
-    exit 1;
-fi
-echo "Setting privileges ......"
-docker exec -it mariadb_main mysql -uroot -p$password -e "GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY 'nextcloudpasswd';FLUSH PRIVILEGES;"
-if [ $? -ne 0 ];then
-    echo "Graning privileges Failed!"
-    exit 1;
-fi
-echo "Seting user host ......"
-docker exec -it mariadb_main mysql -uroot -p$password -e "USE mysql;UPDATE user SET Host='%' WHERE User='nextcloud_user';"
-if [ $? -ne 0 ];then
-    echo "seting host Failed!,please set it manully."
-fi
-echo "Created"
-echo "DataBase   : nextcloud_db"
-echo "User       : nextcloud_user"
-echo "Password   : nextcloudpasswd"
+read -p "Install Nextcloud? (y/n):" answer
+if [ $answer == 'y' ];then
+    #install nextcloud
+    read -p 'Directory of your data:' data_path
+    if [ ! -e data_path ];then
+        echo $data_path" does not exist,using the default '/home/NextCloud' instead."
+        mkdir /home/NextCloud
+        data_path='/home/NextCloud'
+    fi
+    read -p 'Local port for nextcloud:' port
 
-
+    echo "Creating nextcloud container ......"
+    docker run -itd --name=nextcloud_main --network=$network_name -v /home/docker/nextcloud/appconfig:/var/www/html -v $data_path:/var/www/html/data -p $port:80 nextcloud
+    if [ $? -ne 0 ];then
+        echo "Installation Failed!"
+        exit 1;
+    fi
+    
+    echo "Nextcloud installed!"
+    echo "Entry localhost:"$port" to access"
+fi
