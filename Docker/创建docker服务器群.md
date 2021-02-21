@@ -228,14 +228,15 @@ DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcl
     3. 输入以下SQL 完成创建数据库
 
     ```sql
-    CREATE DATABASE nextcloud_db; 
-    CREAT USER nextcloud_user@localhost identified by 'nextcloudpasswd'; 
-    GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY 'nextcloudpasswd'; 
+    CREATE DATABASE nextcloud_db;           --创建数据库
+    CREATE USER nextcloud_user@localhost identified by 'nextcloudpasswd'; --创建用户
+    GRANT ALL PRIVILEGES ON nextcloud_db.* TO nextcloud_user@localhost IDENTIFIED BY 'nextcloudpasswd';   --授予用户对数据库的权限
+    FULSH PRIVILEGES;   --刷新权限
     EXIT;
-    ```
-
-  * 都21世纪了怎么能少了自动化脚本 ？将此脚本复制到docker宿主机上运行即可
-
+  ```
+  
+* 都21世纪了怎么能少了自动化脚本 ？将此脚本复制到docker宿主机上运行即可
+  
     ```shell
     #运维快乐jio本复制粘贴区
     #脚本未经测试，要是拉垮本人不负任何责任
@@ -261,4 +262,45 @@ DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcl
 
 #### 开始安装Nextcloud
 
-> 终于到了开心得安装环节啦，下班码码字再走发现已经块10点了，继续继续
+> 终于到了刺激的~~删库~~安装环节啦，下班码码字再走发现已经块10点了，继续继续。。
+
+安装无非就是从仓库里面拉取镜像之后直接使用就可以了，稍微注意下-v参数的路径就好
+
+```shell
+docker run -itd 										#以交互模式运行
+           --name=nextcloud_main 						  #容器名称
+           --network=OscarsNet  						  #连接到网络（会自动帮你配置host）
+           -v /home/docker/nextcloud/appconfig:/var/www/html #挂载配置目录到本地
+           -v /home/NextCloud/:/var/www/html/data 			#挂载数据目录到本地
+           -p 81:80 								      #暴露端口
+           nextcloud									 #镜像名称
+          
+#参数解释
+#其他都跟上面mariadb的一样
+# -p   :  开放宿主机的81端口并转发到容器的80端口，nextcloud主要是靠网页提供服务，默认端口是80
+```
+
+等待显示容器id之后就表示安装完成了，用命令查看一下
+
+```shell
+CONTAINER ID   IMAGE       COMMAND                  CREATED          STATUS          PORTS                    NAMES
+d70ce9e94f5a   nextcloud   "/entrypoint.sh apac…"   19 minutes ago   Up 19 minutes   0.0.0.0:81->80/tcp       nextcloud_main
+900319f52789   mariadb     "docker-entrypoint.s…"   48 minutes ago   Up 48 minutes   0.0.0.0:3336->3306/tcp   mariadb_main
+```
+
+可以看到之前的mariadb和nextcloud都在运行
+
+#### 完成相关配置
+
+* 安装好之后直接通过宿主机ip:81端口进入Nextcloud配置界面
+
+  ```shell
+  docker run -itd --name=nextcloud_main --network=OscarsNet -v /home/docker/nextcloud/appconfig:/var/www/html -v /home/NextCloud:/var/www/html/data -p 81:80 nextcloud
+  
+  
+  UPDATE user SET Host='%' WHERE User="nextcloud_user";  --设置用户可远程登录
+  ```
+
+     
+
+  
