@@ -236,9 +236,6 @@ DockerHub 上的链接 : [NextCloud官方说明](https://hub.docker.com/_/nextcl
     FULSH PRIVILEGES;   --刷新权限
     EXIT;
     ```
-  ```
-  
-  ```
   
 * 都21世纪了怎么能少了自动化脚本 ？将此脚本复制到docker宿主机上运行即可
   
