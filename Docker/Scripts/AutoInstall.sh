@@ -79,7 +79,7 @@ if [ $answer == 'y' ];then
     read -p 'Local port for nextcloud:' port
 
     echo "Creating nextcloud container ......"
-    docker run -itd --name=nextcloud_main --network=$network_name -v /home/docker/nextcloud/appconfig:/var/www/html -v $data_path:/var/www/html/data -p $port:80 nextcloud
+    docker run -itd --name=nextcloud_main --network=$network_name -v /home/docker/nextcloud/appconfig:/var/www/html -v $data_path:/var/www/html/data -v /home/Data:/home/Data -p $port:80 nextcloud
     if [ $? -ne 0 ];then
         echo "Installation Failed!"
         exit 1;
