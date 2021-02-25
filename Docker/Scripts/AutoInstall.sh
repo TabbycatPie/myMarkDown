@@ -67,6 +67,7 @@ if [ $answer == 'y' ];then
     echo "Password   : nextcloudpasswd"
     echo "Entry localhost:"$port" to access"
 fi
+# 安装Nextcloud 
 read -p "Install Nextcloud? (y/n):" answer
 if [ $answer == 'y' ];then
     #install nextcloud
@@ -87,4 +88,20 @@ if [ $answer == 'y' ];then
     
     echo "Nextcloud installed!"
     echo "Entry localhost:"$port" to access"
+fi
+
+#安装LetsEncrypt
+read -p 'Do you want to install LetsEncrypt?(y/n):' answer
+if [ $answer == 'y' ];then
+    #default value
+    port=8088
+    port2=2443
+    
+    read -p 'Please enter your email:' email_address
+    read -p "Please enter your top domain （e.g:baidu.com）:" top_domain_name
+    read -p "Please enter your subdomains dviding by ',' e.g:www,cloud,chat） :" sub_domain_name
+    read -p "What port do you want to expose for port 80  inside contianer (default：8088):" port
+    read -p "What port do you want to expose for port 443 inside contianer (default：2443):" port2
+    read -p "What time zone do you belong to（default：Asia/Shanghai):" time_zone
+    docker run -itd --cap-add=NET_ADMIN --name=letsencrypt --net=$network_name -v /home/docker/letsencrypt/appconfig:/config:rw -e PGID=1000 -e PUID=1000 -e EMAIL=$email_address -e URL=$top_domain_name -e SUBDOMAINS=$sub_domain_name -e ONLY_SUBDOMAINS=false -e DHLEVEL=2048 -e VALIDATION=dns -e DNSPLUGIN=aliyun -p $port:80  -p $port2:443  -e TZ=$time_zone linuxserver/letsencrypt
 fi
