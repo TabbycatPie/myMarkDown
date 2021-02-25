@@ -94,7 +94,47 @@
 虽然不是同一时间，但是却是同一个 ~~撤硕~~ docker，我还是那句话，奥里给！上代码！
 
 ```shell
-docker run -itd 
+docker run 
+  -itd     					#
+  --cap-add=NET_ADMIN       #
+  --name=letsencrypt        #
+  --net='OscarsNet'         #网络名称
+  -v /home/docker/letsencrypt/appconfig/:/config:rw
+  							#映射配置文件夹
+  -e PGID=1000 
+  -e PUID=1000 
+  -e EMAIL=oscar@qq.com     #颁发ca是需要的email
+  -e URL=baidu.cmo          #你的顶级域名
+  -e SUBDOMAINS=chat,qq,baidu  #子域名
+  -e ONLY_SUBDOMAINS=true   #只为子域名申请ssl证书
+  -e DHLEVEL=2048           #保持不变即
+  -e VALIDATION=dns 		#使用dns验证（保持不变即可）
+  -e DNSPLUGIN=aliyun 		#dns验证插件（保持不变即可）
+  -p '8088:80/tcp'         
+  -p '2443:443/tcp'         #端口映射
+  -e TZ=Asia/Shanghai       #地域选择
+  linuxserver/letsencrypt
 ```
 
-  
+  ```shell
+docker run \
+  -itd \
+  --cap-add=NET_ADMIN \
+  --name=letsencrypt \
+  --net='bravenet' \
+  -v /opt/docker/appdata/letsencrypt/:/config:rw \
+  -e PGID=1000 \
+  -e PUID=1000 \
+  -e EMAIL=braveru@balabala.com \
+  -e URL=braveru.space \
+  -e SUBDOMAINS=chat,qq,baidu \
+  -e ONLY_SUBDOMAINS=true \
+  -e DHLEVEL=2048 \
+  -e VALIDATION=dns \
+  -e DNSPLUGIN=aliyun \
+  -p '8088:80/tcp'  \
+  -p '2443:443/tcp'  \
+  -e TZ=Asia/Shanghai \
+  linuxserver/letsencrypt
+  ```
+
