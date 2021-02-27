@@ -91,17 +91,25 @@ if [ $answer == 'y' ];then
 fi
 
 #安装LetsEncrypt
-read -p 'Do you want to install LetsEncrypt?(y/n):' answer
+read -p 'Install LetsEncrypt?(y/n):' answer
 if [ $answer == 'y' ];then
-    #default value
-    port=8088
-    port2=2443
-    
+    port=''
     read -p 'Please enter your email:' email_address
-    read -p "Please enter your top domain （e.g:baidu.com）:" top_domain_name
-    read -p "Please enter your subdomains dviding by ',' e.g:www,cloud,chat） :" sub_domain_name
+    read -p "Please enter your top domain (e.g:baidu.com):" top_domain_name
+    read -p "Please enter your subdomains dviding by ',' (e.g:www,cloud,chat) :" sub_domain_name
     read -p "What port do you want to expose for port 80  inside contianer (default：8088):" port
+    if [ ! -n "$port" ];then
+        port='8088'
+    fi
     read -p "What port do you want to expose for port 443 inside contianer (default：2443):" port2
+    if [ ! -n "$port2" ];then
+        port2='2443'
+    fi
     read -p "What time zone do you belong to（default：Asia/Shanghai):" time_zone
+    if [ ! -n "$time_zone" ];then
+        time_zone='Asia/Shanghai'
+    fi
     docker run -itd --cap-add=NET_ADMIN --name=letsencrypt --net=$network_name -v /home/docker/letsencrypt/appconfig:/config:rw -e PGID=1000 -e PUID=1000 -e EMAIL=$email_address -e URL=$top_domain_name -e SUBDOMAINS=$sub_domain_name -e ONLY_SUBDOMAINS=false -e DHLEVEL=2048 -e VALIDATION=dns -e DNSPLUGIN=aliyun -p $port:80  -p $port2:443  -e TZ=$time_zone linuxserver/letsencrypt
+    echo "Installed LetsEncrypt!"
+    echo "Entry URL https://localhost:$port2 to access"
 fi
