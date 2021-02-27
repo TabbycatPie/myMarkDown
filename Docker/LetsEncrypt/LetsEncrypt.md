@@ -123,25 +123,7 @@ docker run
   ```shell
 #脚本复制区域
 #需要根据自己的情况不同而改动
-docker run \
-  -itd \
-  --cap-add=NET_ADMIN \
-  --name=letsencrypt \
-  --net='bravenet' \
-  -v /opt/docker/appdata/letsencrypt/:/config:rw \
-  -e PGID=1000 \
-  -e PUID=1000 \
-  -e EMAIL=braveru@balabala.com \
-  -e URL=braveru.space \
-  -e SUBDOMAINS=chat,qq,baidu \
-  -e ONLY_SUBDOMAINS=true \
-  -e DHLEVEL=2048 \
-  -e VALIDATION=dns \
-  -e DNSPLUGIN=aliyun \
-  -p '8088:80/tcp'  \
-  -p '2443:443/tcp'  \
-  -e TZ=Asia/Shanghai \
-  linuxserver/letsencrypt
+docker run -itd --cap-add=NET_ADMIN --name=letsencrypt --net='bravenet' -v /opt/docker/appdata/letsencrypt/:/config:rw -e PGID=1000 -e PUID=1000 -e EMAIL=braveru@balabala.com -e URL=braveru.space -e SUBDOMAINS=chat,qq,baidu -e ONLY_SUBDOMAINS=true -e DHLEVEL=2048 -e VALIDATION=dns -e DNSPLUGIN=aliyun -p '8088:80/tcp' -p '2443:443/tcp'  -e TZ=Asia/Shanghai linuxserver/letsencrypt
   ```
 
 等到镜像拉取安装完成之后然后就需要进去改一下配置
@@ -175,15 +157,112 @@ docker run \
 
   本来letsencrypt给你颁发证书需要，你的域名有80端口和443端口，所以如果服务器使用的是家庭网络的话，ISP是封了这两个端口的，所以会导致验证不成功。那么就使用第二种方法发：在域名上添加一个TXT记录（为了确认这个域名就是你的）然后根据TXT记录确认域名是否是你的，有没有发现以上方法很麻烦，特别是后面涉及到自动续期等问题（这种免费的CA证书失效时间很快一般就在3个月，所以需要自动续期），这种东西要是装在实体机上那肯定是要折磨死人的，这时候像我一样懒的人就做了一个docker，里面可以自动帮咱续期，还有反向代理，功能齐全，
 
-  
-
-  
 
 下面就来配置下
 
-  
+1. 首先打开MobaXtream或者其他带sftp的终端软件（传文件比较方便）
+2. 进入docker映射出来的配置文件夹，比如笔者映射的配置文件目录就是 **/home/docker/letsencry/** 
+3. 找到dns-conf下面的ailyun.ini文件，并打开
+![image-20210227182016603](LetsEncrypt.assets/image-20210227182016603.png)
+4. 之后把你的accesskey和密码填写在相应的额位置就好
+![image-20210227182300966](LetsEncrypt.assets/image-20210227182300966.png)
+5. 保存退出，重启容器
 
-  
+```shell
+docker restart letsencrypt=
+```
 
-  
+6. 访问letencry的2443（容器内是443）![image-20210227182457986](LetsEncrypt.assets/image-20210227182457986.png)我们上面做了端口映射,所以直接在浏览器中访问 docker宿主机的IP:映射端口  就可以了，如果得到如下结果就说明访问成功了（图片上的映射端口是8888）
+
+![image-20210227182736724](LetsEncrypt.assets/image-20210227182736724.png)
+
+
+
+可以看到域名的左边出现了一把小锁，说明我们的访问已经被letsencrypt加密了
+
+#### 配置Nginx 反向代理
+
+上一步我们已经打通了互联网到letsencrypt的通道并为其经行了加密，之后我们需要大同letsencrypt到我们不同容器的通道，这样我们的服务才能够正常使用，这个章节会涉及Nginx的配置文件（别怕，笔者一开始也被大段大段的注释吓到过），所以会稍微有一点难度
+
+上面也清楚的讲了反向代理相关的概念了，Nginx就是可以用来实现反向代理的软件（Nginx小巧但功能非常强大，有兴趣可以研究一下），它被集成在了letsencrypt这个容器之内，而且默认是会自动启动的，我们只需要对其配置文件进行一点配置就可以实现数据的转发了，话不多说，下面就直接开始吧
+
+1. 打开远程终端软件，进入相应的配置文件夹 **/home/docker/letsencrypt/appconfig/** 
+
+2. 进入nginx文件夹，继续进入 **proxy-confs** 文件夹进行代理设置
+
+   ![image-20210227184633698](LetsEncrypt.assets/image-20210227184633698.png)
+
+3. 看到里面有很多文件，不要怕他们得后缀名是.conf.sample，而能够读取是配置文件的后缀名是.conf，他们只是一个配置示例而已，打开按要求修改之后就可以被nginx读取啦
+
+   ![image-20210227185749544](LetsEncrypt.assets/image-20210227185749544.png)
+
+4. 找到（没有的话可以新建）需要配置的服务的配置文件，点击打开（没有就去网上找一找、搜一下，自学也很快的），在这里以nextcloud文件为例，先复制一下留个备份，然后再改掉原文件的文件名（改为conf），然后打开编辑器
+
+   ![image-20210227190213427](LetsEncrypt.assets/image-20210227190213427.png)
+
+   可以看到，上面部分是一些注释（很重要，配置完成之后一定要按照上面的提示去修改nextcloud文件的配置）
+
+   ​				    下面部分才是配置
+
+   ```shell
+   #  nginx http部分的虚拟server 配置块 、
+   #  一个物理机上装的nginx可以为多个软件提供http协议的服务，所以这里server是指虚拟主机
+   server {
+       listen 443 ssl;						
+       listen [::]:443 ssl;				#监听端口（这个是对于letsencrypt容器来讲的，我们已经映射出去了）
+   
+       server_name cloud.*;                #服务器名称 cloud.* ：端口号443(访问域名为cloud.xxxxx)的流量都会被这个 虚拟服务器 所处理            
+       include /config/nginx/ssl.conf;     #ssl配置文件的引用，感兴趣可以去看看这个文件指向的是什么
+   
+       client_max_body_size 0;             #设置用户http上传的文件的最大大小 0表示无限制，也可以根据实际情况限制
+   
+       location / {							#访问位置为 域名/ 的流量都会
+           include /config/nginx/proxy.conf;   #引用porxy配置文件
+           resolver 127.0.0.11 valid=30s;      #和dns解析有关系，保持不表就好
+           set $upstream_app nextcloud_main;    #变量声明 这里把nextcloud_mian 换成你的contianer名字就好
+           set $upstream_port 80;				 # 这里填写 可以访问到你nextcloud容器的端口号（这里内网就可以访问）
+           set $upstream_proto http;            #访问nextcloud时所使用的协议
+           proxy_pass $upstream_proto://$upstream_app:$upstream_port; #这里就是变量的拼接，这个地址一定要能访问nextcloud
+   
+           proxy_max_temp_file_size 2048m;
+       }
+   }
+   ```
+
+   ##### TIPS！
+
+   这里可能刚开始配置的时候location这里会比较懵逼，你需要站在反向代理的位置上去思考问题
+
+   * 反向代理只关系数据的转发
+   * 我们只要打通反向代理和提供服务（nextcloud）的电脑之间的通道就行
+   * 站在nginx的角度上，要去访问nextcloud的提供者
+
+   其实也就是说 `proxy_pass $upstream_proto://$upstream_app:$upstream_port;` 把变量填进去之后
+
+   变成 `http://nextcloud_main:80` 这个URL要指向你的 nextcloud 服务提供者，并且保持联通！
+
+   所以 location这里要站在反向代理的角度去配置这些变量
+
+   ![image-20210227192511882](LetsEncrypt.assets/image-20210227192511882.png)
+
+   你当然也可以通过进入container内部实验一下
+
+   ```shell
+   [root@localhost test]# docker exec -it letsencrypt bash   #进入容器内
+   
+   root@ac7273c8a313:/# curl http://nextcloud_main:80        #curl访问地址，没有报错就正常
+   root@ac7273c8a313:/# ping nextcloud_main				  #ping  测试一下
+   PING nextcloud_main (172.172.0.3): 56 data bytes
+   64 bytes from 172.172.0.3: seq=0 ttl=64 time=0.191 ms
+   64 bytes from 172.172.0.3: seq=1 ttl=64 time=0.174 ms
+   ^C
+   --- nextcloud_main ping statistics ---
+   2 packets transmitted, 2 packets received, 0% packet loss
+   round-trip min/avg/max = 0.174/0.182/0.191 ms
+   
+   ```
+
+   
+
+5. 
 
