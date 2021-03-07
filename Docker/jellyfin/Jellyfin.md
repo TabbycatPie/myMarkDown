@@ -29,3 +29,61 @@ Jellyfin的前身是Emby你会发现两款软件操作逻辑，界面及其相�
 ### 音影分类、整理
 
 > 这里可能会将一个新词汇---- **刮削器**，简单的来说就是如果你有一个不知道哪去下载的一个高清生肉《死侍4》（就是没有字幕），然后就只有这么一个.mp4文件，没有简介没有演员介绍，没有片头，什么都没有。然后你把他放在jellyfin的影音文件夹下面，jellyfin完全可以扫描并播放、推送这个视频，但是确实不够美观。这个时候你可能会去想，能不能自己去网上找一点说明或是图片来修饰一下这个孤零零的文件。其实完全不用，因为这些工作都可以用刮削器来完成
+
+刮削器其实就是一个媒体信息补全软件，使用了刮削器之后，你的媒体库会变得非常整洁，之后我会专门花一些篇幅来讲，在这里就不赘述了，直接开始安装环节
+
+## Jellyfin installation
+
+老规矩，直接上代码
+
+```shell
+docker run 
+-itd 											#交互模式运行
+--name=jellyfin  								#容器名称
+--network=OscarsNet								#配置网络
+-p 8096:8096 									#端口映射
+-v /home/Data/:/home/Data  					    #卷映射，媒体库文件夹
+-v /home/docker/jellyfin/appconfig:/config 		#卷映射，配置文件夹
+--device /dev/dri/card0:/dev/dri/card0			#设备映射，把集显给docker
+--device /dev/dri/renderD128:/dev/dri/renderD128
+jellyfin/jellyfin								#镜像名称
+
+```
+
+一键复制区
+
+```shell
+docker run -itd --name=jellyfin --network=OscarsNet -p 8096:8096 -v /home/Data/:/home/Data -v /home/docker/jellyfin/appconfig:/config --device /dev/dri/card0:/dev/dri/card0 --device /dev/dri/renderD128:/dev/dri/renderD128 jellyfin/jellyfin					
+```
+
+安装之后直接访问8096端口，按照提示完成配置就可以了
+
+之后放几张笔者实验用的临时环境
+
+![image-20210302011422986](Jellyfin.assets/image-20210302011422986.png)
+
+这个是电影墙，有很多奇奇怪怪的东西就不要在意了
+
+![image-20210302011605926](Jellyfin.assets/image-20210302011605926.png)
+
+简介页面，有电影的介绍，可以选择字幕，然后还有演员列表，甚至还有同演员的影片推荐，简直不要太贴心。
+
+![image-20210302011812683](Jellyfin.assets/image-20210302011812683.png)
+
+电视剧直接分季，然后每集都有简介，看看这界面难道你们不想要吗？
+
+
+
+## 关于硬件转码
+
+硬件转码需要在dashboard中配置
+
+![image-20210305225210751](Jellyfin.assets/image-20210305225210751.png)
+
+一般配置为VAAPI就可以了
+
+
+
+## 中文字幕配置
+
+这个没时间折腾了，一般的话手机上的app是支持的，电脑上用kodi

@@ -67,12 +67,39 @@ if [ $answer == 'y' ];then
     echo "Password   : nextcloudpasswd"
     echo "Entry localhost:"$port" to access"
 fi
+# 安装Jellyfin
+read -p "Install Jellyfin？（y/n）:" answer
+if [ $answer == 'y' ];then
+    #install jellyfin
+    read -p 'Directory  of your media:' media_path
+    if [ ! -e media_path ];then
+        echo $media_path" does not exist,using the default '/home/Data' instead."
+        mkdir /home/Data
+        data_path='/home/Data'
+    fi
+    read -p 'Local port for jellyfin(default:8096):' port
+    if [ ! -n "$port" ];then
+        port='8096'
+    fi
+    read -p 'Do you need hardware encoding？(y/n):' answer
+    if [ $answer == 'y' ];then
+        extra='--device /dev/dri/card0:/dev/dri/card0 --device /dev/dri/renderD128:/dev/dri/renderD128'
+    fi
+
+    echo 'Creating Jellyfin container ......'
+    docker run -itd --name=jellyfin --network=$network_name -p $prot:8096 -v $media_path:/home/Data -v /home/docker/jellyfin/appconfig:/config $extra jellyfin/jellyfin
+    if [ $? -ne 0 ];then
+        echo "Installation Failed!"
+        exit 1;
+    fi
+    echo "Jellyfin installed!"
+    echo "Entry localhost:"$port" to access"
 # 安装Nextcloud 
 read -p "Install Nextcloud? (y/n):" answer
 if [ $answer == 'y' ];then
     #install nextcloud
     read -p 'Directory of your data:' data_path
-    if [ ! -e data_path ];then
+    if [ ! -e $data_path ];then
         echo $data_path" does not exist,using the default '/home/NextCloud' instead."
         mkdir /home/NextCloud
         data_path='/home/NextCloud'
