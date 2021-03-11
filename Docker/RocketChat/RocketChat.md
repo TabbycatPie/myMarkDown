@@ -1,3 +1,5 @@
+
+
 # RocketChat安装与配置
 
 ![image-20210305231608784](RocketChat.assets/image-20210305231608784.png)
@@ -18,7 +20,52 @@ rocketchat依赖于mongodb这个数据库，所以安装rocketchat之前，必�
 
 ### 安装并配置MongoDB
 
-复制就可以了
+开始需要把配置文件放到对应位置
+
+```shell
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# Where and how to store data.
+storage:
+  dbPath: /data/db
+  journal:
+    enabled: true
+#  engine:
+#  mmapv1:
+#  wiredTiger:
+
+# network interfaces
+net:
+  port: 27017
+  bindIp: 127.0.0.1
+
+# how the process runs
+processManagement:
+  timeZoneInfo: /usr/share/zoneinfo
+
+#security:
+#  authorization: "enabled"
+
+#operationProfiling:
+
+replication:
+  replSetName: "rs01"
+
+#sharding:
+
+## Enterprise-Only Options:
+
+#auditLog:
+
+#snmp:
+```
+
+> 这里我放在/home/docker/mongodb/appdata,之后会映射到容器内/data/db
+
+之后复制就可以了
 
 ```shell
 docker run 
@@ -26,14 +73,15 @@ docker run
 --name='mongo'  								#容器名
 --net='OscarsNet' 								#连接到网络
 -e TZ="Asia/Shanghai" 							#时区
--p '27017:27017' 								#端口
--v '/home/docker/mongodb/appdata':'/data/db'    #数据地址
--f /data/db/mongod.conf							#配置文件
+-p 27017:27017	 								#端口
+-v /home/docker/mongodb/appdata:/data/db	    #数据地址
+mongo											#镜像
+-f /data/db/mongod.conf							#配置文件(mongd参数)
 ```
 
 ```shell
 #复制区
-docker run -itd --name='mongo' --net='OscarsNet' -e TZ="Asia/Shanghai" -p 27017:27017 -v '/home/docker/mongodb/appdata':'/data/db' -f /data/db/mongod.conf
+docker run -itd --name='mongo' --net='OscarsNet' -e TZ="Asia/Shanghai" -p 27017:27017 -v /home/docker/mongodb/appdata:/data/db mongo -f /data/db/mongod.conf
 ```
 
 之后进入容器内部
@@ -74,10 +122,46 @@ db.createUser({user:"root",pwd:"oscar123456",roles:[{role:"root",db:"admin"}]})
 之后为Rocketchat创建用户并指派角色
 
 ```shell
-db.createUser({user:"rocketchat",pwd:"rocketchat_pawd",roles:[{role:"readWrite",db:"local"},{role:"dbOwner",db:"rocketchat"}]})
+db.createUser({user:"rocketchat",pwd:"rocketchat_pawd",roles:[{role:"readWrite",db:"local"}]})
+ #创建rocketchat数据库并切换到该数据库
+use rocketchat    
+#之后指派一个rocketchat的dbowner
+db.createUser({user:"rocketchat",pwd:"rocketchat_pawd",roles:[{role:"dbOwner",db:"rocketchat"}]})
+
+#之后退出
+exit
 ```
 
-安装完成之后可以试一试用navicat连接一下，如果可以连接上就没问题
+配置完成之后把容器停掉
+
+```shell
+docker stop mongo
+```
+
+之后修改一下配置文件 去掉注释 开启密码验证
+
+```shell
+#修改前
+#security:
+#  authorization: "enabled"
+
+#修改后
+security:
+  authorization: "enabled"
+```
+
+然后再启动下容器就可以了
+
+```shell
+docker start mongo
+```
+
+启动完成之后可以试一试用navicat连接一下，如果可以连接上就没问题
+
+* 注意下防火墙端口开没（不然navicat连不上）
+* 不行的话就删掉容器重新一次弄一遍（不懂得话一定要安顺序搞，不然到时候自己折腾）
+
+
 
 ## Rocketchat Intallation
 
@@ -94,21 +178,21 @@ docker run
 --net='OscarsNet' 
 -e TZ="Asia/Shanghai" 
 
--e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pwd@mongo:27017/rocketchat' 
+-e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/rocketchat' 
 #这个参数比较重要，分为几个部分，按照URL的标准格式
 #<协议>://<用户名>:<密码>@<主机>:<端口>/<路径>?<参数>
 #1.<协议>://：mongodb://
-#2.<用户名>:<密码>：rocketchat:rocketchat_pwd  数据库的用户密码
+#2.<用户名>:<密码>：rocketchat:rocketchat_pawd  数据库的用户密码
 #3.@<主机>:<端口号>：@mongo:27017              填写刚刚的mogodb主机名和端口
 #4./<路径>：rocketchat                        数据库名称
 
 -e 'ROOT_URL'='https://rocketchat.xxxx.xxx:????' 
 #这里填写你的网址 根据需求替换rocketchat.xxxx.xxx:????
 
--e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pwd@mongo:27017/local?authSource=admin' 
+-e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/local?authSource=admin' 
 #老规矩URL
 #1.<协议>://：mongodb://
-#2.<用户名>:<密码>：rocketchat:rocketchat_pwd 数据库的用户密码
+#2.<用户名>:<密码>：rocketchat:rocketchat_pawd 数据库的用户密码
 #3.@<主机>:<端口号>：@mongo:27017             填写刚刚的mogodb主机名和端口
 #4./<路径>： local                           数据库名称
 
@@ -120,6 +204,10 @@ rocketchat/rocket.chat
 
 ```shell
 #复制区
-docker run -itd --name='rocketchat' --net='OscarsNet' -e TZ="Asia/Shanghai" -e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pwd@mongo:27017/rocketchat' -e 'ROOT_URL'='https://rocketchat.xxxx.xxx:????' -e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pwd@mongo:27017/local?authSource=admin' -p 3000:3000 -v /home/docker/rocketchat/appconfig:/app/uploads rocketchat/rocket.chat
+docker run -itd --name='rocketchat' --net='OscarsNet' -e TZ="Asia/Shanghai" -e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/rocketchat' -e 'ROOT_URL'='https://rocketchat.xxxx.xxx:????' -e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/local?authSource=admin' -p 3000:3000 -v /home/docker/rocketchat/appconfig:/app/uploads rocketchat/rocket.chat
+```
+
+```shell
+docker run -itd --name='rocketchat' --net='OscarsNet' -e TZ="Asia/Shanghai" -e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/rocketchat' -e 'ROOT_URL'='https://chat.caliburn.work:8888' -e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/local?authSource=admin' -p 3000:3000 -v /home/docker/rocketchat/appconfig:/app/uploads rocketchat/rocket.chat
 ```
 
