@@ -207,7 +207,54 @@ rocketchat/rocket.chat
 docker run -itd --name='rocketchat' --net='OscarsNet' -e TZ="Asia/Shanghai" -e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/rocketchat' -e 'ROOT_URL'='https://rocketchat.xxxx.xxx:????' -e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/local?authSource=admin' -p 3000:3000 -v /home/docker/rocketchat/appconfig:/app/uploads rocketchat/rocket.chat
 ```
 
+完了之后看看日志出现如下画面就表示大功告成🌶
+
 ```shell
-docker run -itd --name='rocketchat' --net='OscarsNet' -e TZ="Asia/Shanghai" -e 'MONGO_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/rocketchat' -e 'ROOT_URL'='https://chat.caliburn.work:8888' -e 'MONGO_OPLOG_URL'='mongodb://rocketchat:rocketchat_pawd@mongo:27017/local?authSource=admin' -p 3000:3000 -v /home/docker/rocketchat/appconfig:/app/uploads rocketchat/rocket.chat
+docker logs -f rocketchat
 ```
 
+
+
+![image-20210312191736490](RocketChat.assets/image-20210312191736490.png)
+
+之后在浏览器里面输入对应的地址
+
+![image-20210312192003449](RocketChat.assets/image-20210312192003449.png)
+
+跟着向导一步步走就可以辣~
+
+## RocketChat配置
+
+向导完成之后就可以进入到聊天界面了
+
+为了开启消息推送（每月5000条）
+
+然后还有一些配置需要完成
+
+* 首先点击 ‘管理’ 进入到管理页面
+
+![image-20210312194620462](RocketChat.assets/image-20210312194620462.png)
+
+* 之后选择连接服务，然后按照红色箭头提示点击 云控制台 进入官网注册页面
+
+![image-20210312194750583](RocketChat.assets/image-20210312194750583.png)
+
+* 注册一个账号（注册之后需要邮箱验证）
+
+![image-20210312194945655](RocketChat.assets/image-20210312194945655.png)
+
+* 登录上之后进入工作区
+
+![image-20210312195049951](RocketChat.assets/image-20210312195049951.png)
+
+* 选择对应选项之后点击确定
+
+![image-20210312195126207](RocketChat.assets/image-20210312195126207.png)
+
+* 然后把获得的Token粘贴到上文![image-20210312195240403](RocketChat.assets/image-20210312195240403.png)这个页面这里
+
+![image-20210312195155754](RocketChat.assets/image-20210312195155754.png)
+
+* 点击连接之后看到 绿色的成功连接就表示已经好了
+
+![image-20210312195351268](RocketChat.assets/image-20210312195351268.png)
