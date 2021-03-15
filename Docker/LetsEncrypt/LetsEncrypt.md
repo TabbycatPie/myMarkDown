@@ -125,7 +125,7 @@ docker run
   ```shell
 #脚本复制区域
 #需要根据自己的情况不同而改动
-docker run -itd --cap-add=NET_ADMIN --name=letsencrypt --net='bravenet' -v /opt/docker/appdata/letsencrypt/:/config:rw -e PGID=1000 -e PUID=1000 -e EMAIL=braveru@balabala.com -e URL=braveru.space -e SUBDOMAINS=chat,qq,baidu -e ONLY_SUBDOMAINS=true -e DHLEVEL=2048 -e VALIDATION=dns -e DNSPLUGIN=aliyun -p '8088:80/tcp' -p '2443:443/tcp'  -e TZ=Asia/Shanghai linuxserver/letsencrypt
+docker run -itd --cap-add=NET_ADMIN --name=letsencrypt --net='OscarsNet' -v /opt/docker/appdata/letsencrypt/:/config:rw -e PGID=1000 -e PUID=1000 -e EMAIL=braveru@balabala.com -e URL=braveru.space -e SUBDOMAINS=chat,qq,baidu -e ONLY_SUBDOMAINS=true -e DHLEVEL=2048 -e VALIDATION=dns -e DNSPLUGIN=aliyun -p '8088:80/tcp' -p '2443:443/tcp'  -e TZ=Asia/Shanghai linuxserver/letsencrypt
   ```
 
 等到镜像拉取安装完成之后然后就需要进去改一下配置
