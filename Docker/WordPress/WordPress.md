@@ -39,14 +39,13 @@ docker run
 wordpress 
 ```
 
-
-
 ```shell
 #复制区
-docker run -itd --name=wordpress --net=OscarsNet -e WORDPRESS_DB_HOST=mariadb_main:3306 -e WORDPRESS_DB_USER=wordpress_user -e WORDPRESS_DB_PASSWORD=wordpresspasswd -e WORDPRESS_DB_NAME=wordpress_db -p 82:80  wordpress 
+docker run -itd --name=wordpress --net=OscarsNet -e WORDPRESS_DB_HOST=mariadb_main:3306 -e WORDPRESS_DB_USER=wordpress_user -e WORDPRESS_DB_PASSWORD=wordpresspasswd -e WORDPRESS_DB_NAME=wordpress_db -p 82:80  wordpress
 ```
 
+之后访问到对应的端口有东西就说明服务没问题，之后就是反向代理配置了
 
+## 中道崩殂
 
-
-
+wordpress因为架构老旧很多地方还使用的是写死的url，所以反向代理会出大麻烦，而且wordpress官方也宣称支持反向代理不是他们考虑的问题提，再加上查询多次，折腾数日无果，而且本身wordpress对markdown的支持也不是很好，种种原因，我选择了放弃。。改用ghost作为博客方案
