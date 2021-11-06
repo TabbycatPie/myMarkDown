@@ -171,7 +171,7 @@ docker run -itd --cap-add=NET_ADMIN --name=letsencrypt --net='OscarsNet' -v /opt
 5. 保存退出，重启容器
 
 ```shell
-docker restart letsencrypt=
+docker restart letsencrypt
 ```
 
 6. 访问letencry的2443（容器内是443）![image-20210227182457986](LetsEncrypt.assets/image-20210227182457986.png)我们上面做了端口映射,所以直接在浏览器中访问 docker宿主机的IP:映射端口  就可以了，如果得到如下结果就说明访问成功了（图片上的映射端口是8888）
