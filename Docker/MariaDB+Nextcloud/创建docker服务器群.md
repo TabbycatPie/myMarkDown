@@ -274,6 +274,7 @@ docker run -itd 										#以交互模式运行
            --network=OscarsNet  						  #连接到网络（会自动帮你配置host）
            -v /home/docker/nextcloud/appconfig:/var/www/html #挂载 配置 目录到本地
            -v /home/NextCloud/:/var/www/html/data 			 #挂载 数据 目录到本地
+           -v /home/Data/:/home/Data
            -p 81:80 								      #暴露81端口
            nextcloud									 #镜像名称
           
@@ -284,7 +285,7 @@ docker run -itd 										#以交互模式运行
 
 ```shell
 # 一键脚本复制区
-docker run -itd --name=nextcloud_main --network=OscarsNet -v /home/docker/nextcloud/appconfig:/var/www/html -v /data/NextCloud:/var/www/html/data -p 81:80 nextcloud
+docker run -itd --name=nextcloud_main --network=OscarsNet -v /home/docker/nextcloud/appconfig:/var/www/html -v /home/NextCloud:/var/www/html/data -v /home/Data/:/home/Data -p 81:80 nextcloud
 ```
 
 
