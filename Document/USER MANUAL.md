@@ -41,3 +41,32 @@ Assuming you want to set up a Normal key, For example, you bought a 1-key keyboa
 
 > Tips: If you want to set up single action like Ctrl, Shift, Alt, or Win, For example, single "Ctrl", you should make sure to click ADD button after clicking Ctrl on the virtual keyboard as is shown in the picture below, and then you can click Download button to make changes saved.
 
+### Step 6
+
+Assuming you want to set up a Hotkey ( which means Ctrl, Alt, Shift, Win random combination + a normal key ), For example, you bought a 2-key keyboard, and you want to set the action "Copy" ( Control + c in windows, command + c in macOS or iOs ) to KEY1 and "Paste" action to KEY2, the setting steps are shown in the picture below. After following the steps in the picture, finally don't forget to click the Download button.
+
+### Step 7
+
+Assuming you want to set up a Macro ( a macro can substitute your hands' press and lift multiple single keys continuously ). For example, if you bought a 1-key keyboard, and you want to set one-key 1234, just follow the steps in the picture below. These kinds of **string inputs** don't need to add delay. However, some environments need to wait for a while then press another key, for example, you should add some delay between 2 "Enter" actions to give your network or computer some time to send or process your instructions, in this example the delay will be set to 1 second before press "2", you should click the ADVANCE tab first to switch virtual keyboard to advance modules panel, then click "+" button on the left of the "Set Delay" button, click "+" button multiple times until the text box on the left become 1 ( the unit of delay is second ), then click the "Set Delay" button and then click "KEYBOARD" tab to switch the panel to the virtual keyboard, then click "2@" button on the virtual keyboard, and finally click the "Download" button.
+
+### Step 8
+
+Using the function "Load" and "Save" can modify the settings which you saved before more conveniently, you can save your configurations for next-time editing. The file generate by the "Save" function consists of 10 keys ( all shown keys on the software ) configurations, not only the selected one, **All 10 keys' configurations will change when you "Load" the saving file! keep clear about that.**
+
+# PROBLEM-SOLVING
+
+1. Make sure you are using the original cable or android data cable; If the audio output works well, you would hear sounds when you plug or unplug our keyboard.
+
+2. When the software tells you "no device found", and presses any key on the keyboard gets nothing output, maybe there is some problem with the connection, plug it in again, or use another USB port.
+3. After clicking the "Download" button, if the message box alerts you "Download successfully, but there are some problems", plug the keyboard in again, or use another USB port.
+4. When the software tells you "no device found", but you get output when you press any key on the keyboard, you may need to change to another USB port. 
+5. If nothing works using the above methods, you may need to change to another windows computer and do the above method again. If this fails too, then contact customer services.
+
+# SETTINGS' NOTES
+
+1. If you need to set up multiple keyboards, please plug only one keyboard in and set up it then unplug this one and then plug in another, this is because the software can only access one keyboard at the same time.
+2. The device is not working? Maybe this is because of incorrect settings. For example, a "Copy" action is "( Left Ctrl + C )" not the "( Left Ctrl ) + (C)", refer to **Step 6** of the tutorial, or maybe you just forget to click the **"Download" button**, or this key has no configurations, or maybe you map the wrong key, take a good look at keymap.jpg, refer to the **Step 4** of the tutorial.
+3. Get no response when setup a key on the keypad area but it works on the standard layout? maybe it's because the **numlock** is disabled.
+4. The characters on the virtual keyboard are uppercased, they are just a name, and they have no relation to real output. For example, if you set up a "(A)", but the computer has caps lock disabled, then the output will be "a". If you want it to output "A", you need to make settings like this: "( Left Shift + A )".
+5. Multi-media keys, mouse keys, and F13~F24 keys are the same as normal keys like "enter", and "a", don't be confused about that.
+6. Remember to click the "delete" button to clear all configurations which you make before until this KEY becomes unset. For example, certain KEY saved your
