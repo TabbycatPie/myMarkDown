@@ -66,7 +66,37 @@ Using the function "Load" and "Save" can modify the settings which you saved bef
 
 1. If you need to set up multiple keyboards, please plug only one keyboard in and set up it then unplug this one and then plug in another, this is because the software can only access one keyboard at the same time.
 2. The device is not working? Maybe this is because of incorrect settings. For example, a "Copy" action is "( Left Ctrl + C )" not the "( Left Ctrl ) + (C)", refer to **Step 6** of the tutorial, or maybe you just forget to click the **"Download" button**, or this key has no configurations, or maybe you map the wrong key, take a good look at keymap.jpg, refer to the **Step 4** of the tutorial.
-3. Get no response when setup a key on the keypad area but it works on the standard layout? maybe it's because the **numlock** is disabled.
+3. Get no response when setup a key on the keypad area but it works on the standard layout? maybe it's because the num lock is disabled.
 4. The characters on the virtual keyboard are uppercased, they are just a name, and they have no relation to real output. For example, if you set up a "(A)", but the computer has caps lock disabled, then the output will be "a". If you want it to output "A", you need to make settings like this: "( Left Shift + A )".
 5. Multi-media keys, mouse keys, and F13~F24 keys are the same as normal keys like "enter", and "a", don't be confused about that.
-6. Remember to click the "delete" button to clear all configurations which you make before until this KEY becomes unset. For example, certain KEY saved your
+6. Remember to click the "delete" button to clear all configurations which you make before until this KEY becomes unset status. For example, you set up a certain KEY to "( A )", but now, you wanna change it to "( 2 )", you need to click the "Delete" button first, and then click "2@" on the virtual keyboard.
+
+# MACRO NOTES
+
+1. We prescribe a macro as a key that has a delay such as "( Delay 1s + 2 )", or is **NOT** a normal key such as "( A )" **NOR** a hotkey like ( "Left Ctrl + Left Alt + A" ), we call all of them that satisfied the condition we mentioned just now a macro. When one of your macros is running, all keys on the keyboard will be disabled until the macro end.
+
+2. There are 3 limits to our keyboard:
+
+   * Ctrl, Alt, Shift, and Win these 4 **special keys** are limited up to 10 in macro for the whole keyboard;
+   * The limitation of delay is up to 10 for the whole keyboard, each of the delays can be set up from 0.1sec  to 25 sec.
+   * You can configure up to 34 normal key serials for the whole keyboard, for example, if you have a 2-key keyboard and you set one of the keys a 30 normal keys macro, then there are only 4 left for another key, this limitation will be triggered finally if your settings not hit above two limits.
+
+   These 3 limitations are not for a certain key, it's the hardware limitation that exists on every version of our products. You can not continue setups when you hit any one of the 3 limits, so, please take good care of using these precious flash spaces, for example, setting up a delay, you don't need to add a delay on a normal continuous **string input** like "abcdef".
+
+3. Macros are time-consuming programs for our tiny keyboard, so there is 30ms( 0.03sec ) lag between every key, for example,  in the macro "( Left Ctrl ) + ( C )" there is 30ms' lag between "( Left Ctrl ) " and the "( C )".
+
+4. Multi-media keys and mouse keys are not allowed in a macro, a macro only allows normal keys, special keys, and delay. Maybe you think the macro function is just a piece of shit, and so do we, so, we are working on a better keyboard now.
+
+5. When you are making macro setting like "( 2 )", this is a simple replacement of pressing "2" key on a normal keyboard using your finger; If the setting is "( Delay 1s + 2 )", that means wait for 1sec and then press the "2" key then release it.
+
+6. You can trigger a macro continuously by **pressing and holding** the key on the keyboard, for example, if you set up a macro "123" if you press and release the key, the output will be "123", but if you hold that key, you will get "123123123123....".
+
+   
+
+   
+
+   
+
+   
+
+   
