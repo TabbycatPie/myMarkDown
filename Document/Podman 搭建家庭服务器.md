@@ -95,7 +95,7 @@ mkdir -p Calibre/AppConfig
 1. 直接运行，拉取需要时间，等待即可，数据库root密码，卷、端口映射自行安排
 
 ```shell
-podman run -itd --name=MariaDB --network=OscarsNet -e MYSQL_ROOT_PASSWORD='tianxianbbnn123' -v /home/Docker/MariaDB/AppConfig:/etc/mysql -v /home/Docker/MariaDB/AppData:/var/lib/mysql -p 3306:3306 mariadb
+podman run -itd --name=MariaDB --network=OscarsNet -e MYSQL_ROOT_PASSWORD='< your password here >' -v /home/Docker/MariaDB/AppConfig:/etc/mysql -v /home/Docker/MariaDB/AppData:/var/lib/mysql -p 3306:3306 mariadb
 ```
 
 2. 检查容器是否运行，并进入容器
@@ -157,7 +157,7 @@ php occ files:scan --all
 还有就是cifs挂载的时候需要注意，修改fstab之后需要吧目录权限和文件权限全部改为0770，uid、pid改为33不然nextcloud会因为权限问题报错，我的fstab是这样配置的
 
 ```shell
-//192.168.3.2/DataSMB /home/Data cifs defaults,username=< your smb username here >,password=< your smb pass word here >,uid=33,gid=33,dir_mode=0770,file_mode=0770 0 0
+//192.168.3.2/DataSMB /home/Data cifs defaults,username=< your smb username here >,password=< your smb password here >,uid=33,gid=33,dir_mode=0770,file_mode=0770 0 0
 ```
 
 如果是使用NFS的话挂载语句如下，添加到/etc/fstab即可
@@ -441,11 +441,28 @@ podman run -itd --name=BaiduNetDisk --network=OscarsNet -e USER_ID=33 -e GROUP_I
 1. REFRESH_TOKEN参照教程打开浏览器获取
 2. WEBDAV_AUTH_USER/PASSWORD :webdav用户名密码挂载的时候有用
 
+打开aliyun盘网页https://www.aliyundrive.com/drive/
+
+F12 打开开发者模式,进入console输入下面代码获取token
+
+~~~js
+JSON.parse(window.localStorage["token"]).refresh_token;
+~~~
+
 ```shell
-podman run -itd --name=AliyunDriveWebDav -p 9090:8080 -v $PWD/docker/aliyundrive-webdav/:/etc/aliyundrive-webdav/ -e REFRESH_TOKEN='your refreshToken' -e WEBDAV_AUTH_USER=oscar -e WEBDAV_AUTH_PASSWORD=tianxianbbnn123 messense/aliyundrive-webdav
+podman run -itd --name=AliyunDriveWebDav -p 9090:8080 -v /home/Docker/AliyunDisk/AppData:/etc/aliyundrive-webdav/ -e REFRESH_TOKEN='< your aliyun token >' -e WEBDAV_AUTH_USER=< username for dav > -e WEBDAV_AUTH_PASSWORD=< password for dav > messense/aliyundrive-webdav
 ```
 
-### 迅雷
+访问9090端口输入刚刚设置的用户名密码之后就可以访问云盘里面的东西了，之后再把webDAV挂载到本地就可以直接操作了
+
+```shell
+yum install davfs2
+mount -t davfs localhost:9090 /home/webDAV/
+```
+
+
+
+## 迅雷
 
 迅雷上了群晖，后面有大佬做成了容器https://hub.docker.com/r/cnk3x/xunlei, 默认端口2345
 
