@@ -78,12 +78,14 @@ Using the function "Load" and "Save" can modify the settings which you saved bef
 
 # PROBLEM-SOLVING
 
-1. Make sure you are using the original cable or android data cable; If the audio output works well, you would hear sounds when you plug or unplug our keyboard.
+1. If you see "Windows has protected your computer" alert when you open the .exe file, just try "Run as administrator".
 
-2. When the software tells you "no device found", and presses any key on the keyboard gets nothing output, maybe there is some problem with the connection, plug it in again, or use another USB port.
-3. After clicking the "Download" button, if the message box alerts you "Download successfully, but there are some problems", plug the keyboard in again, or use another USB port.
-4. When the software tells you "no device found", but you get output when you press any key on the keyboard, you may need to change to another USB port. 
-5. If nothing works using the above methods, you may need to change to another windows computer and do the above method again. If this fails too, then contact customer services.
+2. Make sure you are using the original cable or android data cable; If the audio output works well, you would hear sounds when you plug or unplug our keyboard.
+
+3. When the software tells you "no device found", and presses any key on the keyboard gets nothing output, maybe there is some problem with the connection, plug it in again, or use another USB port.
+4. After clicking the "Download" button, if the message box alerts you "Download successfully, but there are some problems", plug the keyboard in again, or use another USB port.
+5. When the software tells you "no device found", but you get output when you press any key on the keyboard, you may need to change to another USB port. 
+6. If nothing works using the above methods, you may need to change to another windows computer and do the above method again. If this fails too, then contact customer services.
 
 # SETTINGS' NOTES
 
